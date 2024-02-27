@@ -14,7 +14,6 @@ from pathlib import Path
 from datetime import timedelta
 
 import dj_database_url
-import environ
 import os
 
 # Define a function to manually parse the .env file
