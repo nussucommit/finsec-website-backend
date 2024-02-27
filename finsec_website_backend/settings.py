@@ -16,21 +16,16 @@ from datetime import timedelta
 import dj_database_url
 import os
 
-# Define a function to manually parse the .env file
 def read_dotenv(env_file_path):
     with open(env_file_path) as f:
         for line in f:
             if line.startswith('#') or not line.strip():
-                continue  # Skip comments and empty lines
-            # Split the line into key/value pair
+                continue
             key, value = line.strip().split('=', 1)
-            # Set the value in environment variables
             os.environ[key] = value
 
-# Path to your .env file
 env_file = os.path.join(os.path.dirname(__file__), '.env')
 
-# Call the function if the .env file exists
 if os.path.isfile(env_file):
     read_dotenv(env_file)
 
