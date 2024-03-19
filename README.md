@@ -83,8 +83,9 @@ psql postgres
 # CREATE USER finsecuser WITH PASSWORD 'finsec';
 # GRANT ALL PRIVILEGES ON DATABASE finsec TO finsecuser;
 ```
+7. Leave the Postgres shell running on WSL for the later steps. 
 
-7. `CTRL-D` to exit the Postgres shell, and `CTRL-D` to logout of the Postgres superuser
+8. If you wish to to exit the Postgres shell use `CTRL-D`, and another `CTRL-D` to logout of the Postgres superuser
 
 ### Create a Virtual Environment and Install Requirements
 
@@ -110,13 +111,15 @@ $ pip install -r requirements.txt
 
 ### Create Admin User
 
-1. Run in terminal
+1. Change directory back to the root folder `./finsec-website-backend`
+
+2. Run in terminal
 
 ```
 $ python3 manage.py createsuperuser
 ```
 
-2. Enter username and password
+3. Enter username and password
 
 ### Setup and Run the Django Backend
 
