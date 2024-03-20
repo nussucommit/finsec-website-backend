@@ -342,7 +342,7 @@ $ python3 manage.py runserver
 
 ## Troubleshoot
 
-### Error: Connection refused
+### Error: Connection refused or you are able to connect on WSL but not on Powershell
 
 Detailed error:
 ```
@@ -350,6 +350,75 @@ django.db.utils.OperationalError: connection to server at "localhost" (127.0.0.1
         Is the server running on that host and accepting TCP/IP connections?
 ```
 
-Solution:
+Solution A (Port not correctly configured):
 1. Check your PostgreSQL port using `sudo service postgresql status` for windows users, or `brew services list` for mac users.
 2. If your port number (should be starting with 54..) is different from port 5434, update the `DB_PORT` variable in your `.env` file accordingly
+
+Solution B (Port correctly configured but multiple instances of postgres listening on the same port) 
+- This problem usually occurs when you have another psql instance listening
+on the same port (5432)
+- In .env file change the following
+```py
+DB_PORT=5433
+DATABASE_URL=postgres://finsecuser:finsec@localhost:5433/finsec
+```
+[Note that this .env file is for local testing so we are not exposing anything]
+
+### Error during python manage.py migrate
+Detailed error:
+```
+psycopg2.errors.InsufficientPrivilege: permission denied for schema public
+```
+Solution:
+
+In WSL:
+```bash
+sudo -u postgres psql
+```
+
+In PSQL subsequently:
+```sql
+ALTER ROLE finsecuser WITH LOGIN CREATEDB;
+ALTER DATABASE finsec OWNER TO finsecuser;
+GRANT USAGE ON SCHEMA public TO finsecuser;
+GRANT CREATE ON SCHEMA public TO finsecuser;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO finsecuser;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO finsecuser;
+```
+
+### HTTP 500 error when running `python3 manage.py runserver` and accessing the endpoints
+
+Before debugging this problem, it would be useful to verify the number of relations
+in the finsec database. Execute the following: 
+
+In WSL:
+```bash
+sudo -u postgres psql
+```
+
+In PSQL:
+```bash
+\c finsec
+\dt
+```
+If you only see 10 rows and none of the tables that were created under /api/models, it is likely you have not applied migrations from ```/api```. 
+
+Solution:
+
+In powershell:
+```bash
+python manage.py makemigrations api
+python manage.py migrate
+```
+Now you should see the tables that you have created get migrated. To double check use:
+
+In WSL:
+```bash
+sudo -u postgres psql
+```
+
+In PSQL:
+```bash
+\c finsec
+\dt
+```
